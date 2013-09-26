@@ -9,10 +9,11 @@ end
 module EntityStatus
   extend ActiveSupport::Concern
   module ClassMethods
-    def entity_status(*statuses)
-      statuses = (statuses.count > 0) ? statuses : %W(pending open closed)
-      statuses.each do |st|
-        self.create_method(st)
+    def entity_status(*status_array)
+      status_array = (status_array.count > 0) ? status_array : %W(pending open closed)
+      self.create_statuses_method('statuses',status_array)
+      status_array.each do |st|
+        self.create_finder_methods(st)
         
         # add dynamic state setters based on the status string
         # example: Post.first.pending #=> 'pending'
@@ -29,7 +30,19 @@ module EntityStatus
       end
       
     end
-    def create_method(name)
+
+    def create_statuses_method(name,statuses)
+      klass = self.to_s
+      metaclass.instance_eval do
+        # attr_accessor :statuses        
+        # @@statuses = statuses
+        define_method(name){
+          return statuses
+        }
+      end
+    end
+
+    def create_finder_methods(name)
       klass = self.to_s
       metaclass.instance_eval do
         define_method(name){
@@ -37,11 +50,12 @@ module EntityStatus
         }
       end
     end
+    
   end
 
   module InstanceMethods
     def state
-      self.status
+      self.status.to_s
     end
 
     def dependant_state_update(state)
