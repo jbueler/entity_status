@@ -9,23 +9,23 @@ end
 module EntityStatus
   extend ActiveSupport::Concern
   module ClassMethods
-    def entity_status(*status_array)
+    def entity_status(column_name="status",status_array = [])
       status_array = (status_array.count > 0) ? status_array : %W(pending open closed)
-      self.create_statuses_method('statuses',status_array)
+      self.create_statuses_method(column_name.to_s.pluralize,status_array)
       status_array.each do |st|
-        self.create_finder_methods(st)
+        self.create_finder_methods(column_name,st)
         
         # add dynamic state setters based on the status string
         # example: Post.first.pending #=> 'pending'
         define_method st do
-          self.status = st
+          self.send("#{column_name}=".to_sym,st.to_s)
           self
         end
     
         # Add boolean state checks based on the status string
         # example: Post.first.pending? #=> true
         define_method "#{st}?" do
-          (self.state == st) ? true :false
+          (self.send(column_name) == st) ? true :false
         end
       end
       
@@ -42,11 +42,11 @@ module EntityStatus
       end
     end
 
-    def create_finder_methods(name)
+    def create_finder_methods(column_name,name)
       klass = self.to_s
       metaclass.instance_eval do
         define_method(name){
-          where(status: name)
+          where(column_name.to_sym => name)
         }
       end
     end
