@@ -18,17 +18,10 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activerecord'
 
-  # s.add_development_dependency 'railties', '~> 4.0.0'
-  # s.add_development_dependency 'minitest', '>= 4.4.0'
-  # s.add_development_dependency 'mocha', '~> 0.13.3'
-  # s.add_development_dependency 'yard'
-  # s.add_development_dependency 'i18n'
-  # s.add_development_dependency 'ffaker'
-  # s.add_development_dependency 'simplecov'
-  # s.add_development_dependency 'redcarpet'
-
   s.description = <<-EOM
   A simple work in progress gem for adding status string to activerecord models.
   Creates scopes and status setting/testing methods.
 EOM
 end
+
+git checkout $(git rev-list -n 1 HEAD -- "entity_status-0.0.1.gem")^ -- "entity_status-0.0.1.gem"
