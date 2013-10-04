@@ -1,5 +1,6 @@
 entity_status
 =============
+[![Gem Version](https://badge.fury.io/rb/entity_status.png)](http://badge.fury.io/rb/entity_status)
 
 Ruby Gem for adding status helper methods to an activerecord model.
 

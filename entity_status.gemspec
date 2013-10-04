@@ -8,7 +8,6 @@ Gem::Specification.new do |s|
   s.email             = ["jbueler@gmail.com"]
   s.homepage          = "https://github.com/jbueler/entity_status"
   s.summary           = "Simple entity status module for fetching and setting entities by status string."
-  # s.rubyforge_project = "friendly_id"
   s.files             = `git ls-files`.split("\n")
   s.test_files        = `git ls-files -- {test}/*`.split("\n")
   s.require_paths     = ["lib"]
@@ -23,5 +22,3 @@ Gem::Specification.new do |s|
   Creates scopes and status setting/testing methods.
 EOM
 end
-
-git checkout $(git rev-list -n 1 HEAD -- "entity_status-0.0.1.gem")^ -- "entity_status-0.0.1.gem"
