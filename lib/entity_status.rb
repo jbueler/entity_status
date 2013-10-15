@@ -9,19 +9,28 @@ end
 module EntityStatus
   extend ActiveSupport::Concern
   module ClassMethods
-    def entity_status(column_name="status",status_array = [])
+    def entity_status(column_name="status",status_array = [], options = { destroyed_status: nil})
       status_array = (status_array.count > 0) ? status_array : %W(pending open closed)
+
+      if options[:destroyed_status]
+        status_array << options[:destroyed_status]
+        self.set_default_scope(column_name, options[:destroyed_status])
+        
+        define_method 'destroyed_status' do
+          options[:destroyed_status]
+        end
+      end
+      
       self.create_statuses_method(column_name.to_s.pluralize,status_array)
       status_array.each do |st|
         self.create_finder_methods(column_name,st)
-        
         # add dynamic state setters based on the status string
         # example: Post.first.pending #=> 'pending'
         define_method st do
           self.send("#{column_name}=".to_sym,st.to_s)
           self
         end
-    
+        
         # Add boolean state checks based on the status string
         # example: Post.first.pending? #=> true
         define_method "#{st}?" do
@@ -30,7 +39,15 @@ module EntityStatus
       end
       
     end
-
+    
+    def set_default_scope(column_name,destroyed_status)
+      self.default_scope where.not(column_name.to_sym => destroyed_status)
+      # klass = self.to_s
+      # metaclass.instance_eval do
+      #   default_scope where.not(column_name.to_sym => destroyed_status)
+      # end
+    end
+    
     def create_statuses_method(name,statuses)
       klass = self.to_s
       metaclass.instance_eval do
@@ -54,10 +71,6 @@ module EntityStatus
   end
 
   module InstanceMethods
-    def state
-      self.status.to_s
-    end
-
     def dependant_state_update(state)
       self.update_attributes status: state
       self.reflections.each do |rel|
@@ -81,6 +94,7 @@ module EntityStatus
       
     if receiver.method_defined?(:attr_accessible)
       receiver.attr_accessible :status
+      receiver.attr_accessible :destroyed_status
       # receiver.after_create :default_status
     end
   end

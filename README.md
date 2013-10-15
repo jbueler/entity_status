@@ -34,6 +34,28 @@ You can configure multiple status columns per model by calling entity_status mul
 			entity_status :moderation_status, [:pending,:approved,:rejected]
 		end
 
+Adding soft destroy
+
+		class Post < ActiveRecord::Base
+			include EntityStatus
+			entity_status :status, [:incomplete,:complete], {destroyed_status: 'destroyed'}
+		end
+
+
+All of the normal helpers will exist with the `destroyed_status` with an additional helper on the entity for `destroyed_status`. It will also create a default_scope to not include the soft destroyed entires by default.
+
+		Post.destroyed_status #=> 'destroyed'
+		
+		Post.all.count #=> 3
+		Post.unscoped.all.count #=> 9
+		Post.destroyed #=> will return the active record relation for all soft destroyed entitities
+		Post.destroyed.count #=> 6
+		
+
+
+
+
+
 ### Using EntityStatus
 You can now start using the helper methods:
 
@@ -51,4 +73,6 @@ You can now start using the helper methods:
 			// THIS IS NOT APPROVED
 		end
 		
+
+
 
