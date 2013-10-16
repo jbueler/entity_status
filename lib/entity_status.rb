@@ -41,7 +41,7 @@ module EntityStatus
     end
     
     def set_default_scope(column_name,destroyed_status)
-      self.default_scope where.not(column_name.to_sym => destroyed_status)
+      self.default_scope {where.not(column_name.to_sym => destroyed_status)}
       # klass = self.to_s
       # metaclass.instance_eval do
       #   default_scope where.not(column_name.to_sym => destroyed_status)
